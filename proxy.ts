@@ -31,7 +31,18 @@ export async function proxy(request: NextRequest) {
         }
     );
 
-    await supabase.auth.getClaims();
+    const { data } = await supabase.auth.getClaims();
+
+    const isLoggedIn = !!data?.claims;
+    const isLoginPage = request.nextUrl.pathname === "/login";
+
+    if (!isLoggedIn && !isLoginPage) {
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (isLoggedIn && isLoginPage) {
+        return NextResponse.redirect(new URL("/", request.url));
+    }
 
     return response;
 }
