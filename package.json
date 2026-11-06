@@ -1,31 +1,18 @@
-{
-  "name": "ta27a-temp",
-  "version": "0.1.0",
+﻿{
+  "name": "ta27a",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "netlify dev",
+    "build": "node -e \"console.log('TA27A static build ready')\""
   },
   "dependencies": {
     "@google/genai": "^2.22.0",
-    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
-    "next": "16.3.5",
-    "pdf-parse": "^1.1.1",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "pdf-parse": "1.1.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^9",
-    "eslint-config-next": "16.3.5",
-    "postcss": "^8.5.23",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "netlify-cli": "^23.0.0"
   }
 }

@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d19">
+  <meta name="description" content="TA27A - AI Document Intelligence">
+  <title>TA27A | AI Document Intelligence</title>
+  <link rel="icon" href="/ta27a.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="loadingScreen" class="loading-screen">
+    <div class="brand-mark">T</div>
+    <p>جاري تشغيل TA27A...</p>
+  </div>
+
+  <section id="authScreen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand-mark">T</div>
+      <h1>TA27A</h1>
+      <p class="muted">ذكاء اصطناعي لفهم مستنداتك</p>
+
+      <div class="auth-tabs">
+        <button id="loginTab" class="auth-tab active" type="button">تسجيل الدخول</button>
+        <button id="signupTab" class="auth-tab" type="button">إنشاء حساب</button>
+      </div>
+
+      <form id="authForm">
+        <label for="email">البريد الإلكتروني</label>
+        <input id="email" type="email" placeholder="name@example.com" required autocomplete="email">
+
+        <label for="password">كلمة المرور</label>
+        <input id="password" type="password" placeholder="6 أحرف على الأقل" required minlength="6" autocomplete="current-password">
+
+        <button id="authSubmit" class="primary-button full-width" type="submit">تسجيل الدخول</button>
+      </form>
+      <p id="authMessage" class="message" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section id="appScreen" class="app-screen hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark small">T</div>
+        <div><strong>TA27A</strong><small>Document Intelligence</small></div>
+        <button id="closeSidebar" class="icon-button mobile-only" type="button" aria-label="إغلاق القائمة">×</button>
+      </div>
+
+      <button id="newConversation" class="new-chat-button" type="button">
+        <span>＋</span> محادثة جديدة
+      </button>
+
+      <div class="sidebar-heading">محادثاتك السابقة</div>
+      <div id="conversationList" class="conversation-list">
+        <p class="muted small-text">لا توجد محادثات بعد</p>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div id="userEmail" class="user-email"></div>
+        <button id="themeToggle" class="secondary-button full-width" type="button">☀️ الوضع النهاري</button>
+        <button id="logoutButton" class="logout-button full-width" type="button">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button id="openSidebar" class="icon-button mobile-only" type="button" aria-label="فتح القائمة">☰</button>
+        <div class="topbar-title">
+          <strong>TA27A</strong>
+          <span class="status-dot"></span>
+          <small>متصل</small>
+        </div>
+        <span class="topbar-caption">AI Document Intelligence</span>
+      </header>
+
+      <div class="workspace">
+        <section id="welcomePanel" class="welcome-panel">
+          <div class="welcome-symbol">✦</div>
+          <h2>مرحباً بك في <span>TA27A</span></h2>
+          <p>ارفع مستند PDF وابدأ بطرح الأسئلة. دع الذكاء الاصطناعي يساعدك على فهم محتواه.</p>
+
+          <label id="dropZone" class="drop-zone" for="pdfInput">
+            <div class="upload-icon">↑</div>
+            <strong>اختر ملف PDF أو اسحبه إلى هنا</strong>
+            <span>يدعم ملفات PDF فقط</span>
+            <span class="browse-label">تصفح الملفات</span>
+          </label>
+          <input id="pdfInput" type="file" accept="application/pdf,.pdf" hidden>
+          <p id="uploadStatus" class="message" aria-live="polite"></p>
+        </section>
+
+        <section id="documentPanel" class="document-panel hidden">
+          <div class="document-heading">
+            <div class="document-icon">PDF</div>
+            <div class="document-info">
+              <strong id="documentName">document.pdf</strong>
+              <small id="documentStatus">تم تحميل المستند</small>
+            </div>
+            <button id="changeFile" class="secondary-button" type="button">تغيير الملف</button>
+          </div>
+
+          <div id="chatMessages" class="chat-messages"></div>
+
+          <form id="questionForm" class="question-form">
+            <textarea id="questionInput" rows="1" placeholder="اكتب سؤالك حول المستند..." required></textarea>
+            <button id="sendQuestion" class="send-button" type="submit" aria-label="إرسال السؤال">➤</button>
+          </form>
+          <p class="chat-disclaimer">قد يخطئ الذكاء الاصطناعي. راجع المعلومات المهمة من المستند الأصلي.</p>
+        </section>
+      </div>
+    </main>
+  </section>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
