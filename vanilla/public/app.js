@@ -1,4 +1,4 @@
-﻿const API = "/.netlify/functions";
+const API = "/.netlify/functions";
 
 let supabaseClient;
 let currentUser = null;
@@ -285,6 +285,81 @@ async function saveMessage(role, content) {
   });
 }
 
+function createAgentProgress() {
+  const container = $("chatMessages");
+  const card = document.createElement("div");
+  card.className = "agent-progress";
+
+  const title = document.createElement("strong");
+  title.className = "agent-progress-title";
+  title.textContent = "TA27A — تعاون الوكلاء الذكي";
+
+  const stages = [
+    { id: "document", name: "Document Agent", description: "قراءة المستند واستخراج الأدلة" },
+    { id: "analysis", name: "Analysis Agent", description: "تحليل المعلومات والنتائج" },
+    { id: "verification", name: "Verification Agent", description: "مراجعة النتائج والتحقق منها" },
+    { id: "answer", name: "Answer Agent", description: "صياغة الإجابة النهائية" }
+  ];
+
+  const rows = {};
+
+  card.appendChild(title);
+
+  stages.forEach((stage) => {
+    const row = document.createElement("div");
+    row.className = "agent-step";
+    row.dataset.stage = stage.id;
+
+    const info = document.createElement("div");
+    info.className = "agent-step-info";
+
+    const name = document.createElement("strong");
+    name.textContent = stage.name;
+
+    const description = document.createElement("small");
+    description.textContent = stage.description;
+
+    const status = document.createElement("span");
+    status.className = "agent-step-status";
+    status.textContent = "بانتظار البدء";
+
+    info.append(name, description);
+    row.append(info, status);
+    card.appendChild(row);
+
+    rows[stage.id] = { row, status };
+  });
+
+  container.appendChild(card);
+  container.scrollTop = container.scrollHeight;
+
+  return {
+    setRunning(id) {
+      const item = rows[id];
+      item.row.classList.remove("completed", "failed");
+      item.row.classList.add("running");
+      item.status.textContent = "جاري العمل...";
+      container.scrollTop = container.scrollHeight;
+    },
+
+    setCompleted(id) {
+      const item = rows[id];
+      item.row.classList.remove("running", "failed");
+      item.row.classList.add("completed");
+      item.status.textContent = "اكتمل ✓";
+      container.scrollTop = container.scrollHeight;
+    },
+
+    setFailed(id) {
+      const item = rows[id];
+      item.row.classList.remove("running", "completed");
+      item.row.classList.add("failed");
+      item.status.textContent = "تعذر إكمال المرحلة";
+      container.scrollTop = container.scrollHeight;
+    }
+  };
+}
+
 async function askQuestion(question) {
   if (!currentConversationId || !currentDocumentText) {
     showToast("ارفع ملف PDF أولاً.");
@@ -297,30 +372,69 @@ async function askQuestion(question) {
   addMessage("user", question);
   $("questionInput").value = "";
 
-  try {
-    await saveMessage("user", question);
+  const progress = createAgentProgress();
+  let activeStage = null;
+
+  const runAgent = async (stage, context = {}) => {
+    activeStage = stage;
+    progress.setRunning(stage);
 
     const result = await apiRequest("chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        stage,
         prompt: question,
-        documentText: currentDocumentText
+        documentText: currentDocumentText,
+        context
       })
     });
 
-    addMessage("assistant", result.text);
-    await saveMessage("assistant", result.text);
+    if (!result.success || !result.text) {
+      throw new Error(result.error || `${stage} failed.`);
+    }
+
+    progress.setCompleted(stage);
+    activeStage = null;
+    return result.text;
+  };
+
+  try {
+    await saveMessage("user", question);
+
+    const evidence = await runAgent("document");
+
+    const analysis = await runAgent("analysis", {
+      evidence
+    });
+
+    const verification = await runAgent("verification", {
+      evidence,
+      analysis
+    });
+
+    const answer = await runAgent("answer", {
+      verification
+    });
+
+    addMessage("assistant", answer);
+    await saveMessage("assistant", answer);
     await loadConversations();
 
   } catch (error) {
-    addMessage("assistant", `حدث خطأ: ${error.message}`);
+    if (activeStage) {
+      progress.setFailed(activeStage);
+    }
+
+    addMessage(
+      "assistant",
+      `تعذر إكمال التحليل: ${error.message || "حدث خطأ غير متوقع."}\nيمكنك المحاولة مرة أخرى.`
+    );
   } finally {
     sendButton.disabled = false;
     $("questionInput").focus();
   }
 }
-
 async function openConversation(id) {
   try {
     const result = await apiRequest(`conversation?id=${encodeURIComponent(id)}`);

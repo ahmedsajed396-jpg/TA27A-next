@@ -1,4 +1,4 @@
-﻿import pdfParse from "pdf-parse";
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import { getAuthContext, json, methodNotAllowed } from "./_shared.mjs";
 
 export async function handler(event) {

@@ -1,4 +1,4 @@
-﻿[build]
+[build]
   publish = "vanilla/public"
   functions = "netlify/functions"
   command = "npm run build"
@@ -6,7 +6,7 @@
 [functions]
   node_bundler = "esbuild"
 
-[[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+[dev]
+  framework = "#static"
+  publish = "vanilla/public"
+  port = 8888

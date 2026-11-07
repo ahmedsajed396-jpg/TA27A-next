@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "ta27a",
   "version": "1.0.0",
   "private": true,
@@ -13,6 +13,6 @@
     "pdf-parse": "1.1.1"
   },
   "devDependencies": {
-    "netlify-cli": "^23.0.0"
+    "netlify-cli": "^23.15.1"
   }
 }
